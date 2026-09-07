@@ -19,6 +19,16 @@ jobs:
         run: |
           set -x
           git clone --recursive -b 4 https://github.com/roothide/Dopamine2-roothide ${{ github.workspace }}
+
+      - name: Select Xcode (avoid Swift 5.10 SILGen crash)
+        run: |
+          set -x
+          ls -d /Applications/Xcode*.app
+          XC=$(ls -d /Applications/Xcode_*.app 2>/dev/null | grep -v 'Xcode_15\.4' | sort -V | tail -1)
+          if [ -z "$XC" ]; then echo "15.4 외의 Xcode 가 없습니다"; exit 1; fi
+          sudo xcode-select -s "$XC/Contents/Developer"
+          xcodebuild -version
+          swift --version
           
       - name: Install Procursus
         uses: dhinakg/procursus-action@main
